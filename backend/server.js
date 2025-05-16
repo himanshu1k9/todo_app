@@ -2,6 +2,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const userROutes = require('./routes/userRoutes');
+const cookieParser = require('cookie-parser');
 
 const db = require('./config/dbConnect');
 
@@ -15,6 +16,7 @@ todoApp.use(cors());
 const port = process.env.APP_PORT || 8000;
 todoApp.use(express.urlencoded({ extended: true }));
 todoApp.use(express.json());
+todoApp.use(cookieParser());
 todoApp.use('/todo', userROutes);
 
 

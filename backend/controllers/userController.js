@@ -1,5 +1,7 @@
 const userModel = require('../models/userModel');
 const validator = require('validator');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 module.exports.registerUser = async (req, res) =>
 {
@@ -61,5 +63,55 @@ module.exports.registerUser = async (req, res) =>
             success: false,
             message: errMessage
         }).status(500);
+    }
+}
+
+module.exports.loginUser = async (req, res) =>
+{
+    const { email, password } = req.body;
+    if(!email || !password)
+    {
+        return res.json({
+            success: false,
+            message: 'Either email or password is missing.'
+        }).status(400);
+    }
+
+    const existingUser = await userModel.findOne({email: email});
+    if(existingUser)
+    {
+        const isMatched = await bcrypt.compare(password, existingUser.password);
+        if(isMatched)
+        {
+            const token = await jwt.sign({user: existingUser}, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
+            if(token)
+            {
+                res.cookie('token', token, {
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === 'production',
+                    maxAge: 1 * 60 * 60 * 1000,
+                });
+                return res.json({
+                    token: token,
+                    success: true,
+                    message: 'User logged in successfully.'
+                }).status(200);
+            } else {
+                return res.json({
+                    success: false,
+                    message: 'An error occured while generating the token.'
+                }).status(500);
+            }
+        } else {
+            return res.json({
+                success: false,
+                message: 'Invalid email or password.'
+            }).status(400);
+        }
+    } else {
+        return res.json({
+            success: false,
+            message: 'User not found'
+        }).status(400);
     }
 }
