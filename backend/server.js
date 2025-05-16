@@ -1,6 +1,7 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
+const userROutes = require('./routes/userRoutes');
 
 const db = require('./config/dbConnect');
 
@@ -12,25 +13,24 @@ todoApp.use(cors());
 
 
 const port = process.env.APP_PORT || 8000;
+todoApp.use(express.urlencoded({ extended: true }));
+todoApp.use(express.json());
+todoApp.use('/todo', userROutes);
 
 
 module.exports.startServer = async () =>
 {
-    let bdConnection = await db.connectDB();
-
-    if(bdConnection)
+    await db.connectDB();
+    let server;
+    try
     {
-        let server;
-        try
-        {
-            server = await todoApp.listen(port);
-        } catch(error) {
-            console.log(`Server starting error :: ${error}`);
-        }
+        server = await todoApp.listen(port);
+    } catch(error) {
+        console.log(`Server starting error :: ${error}`);
+    }
 
-        if(server)
-        {
-            console.log(`Server is up and rumimg on port :: ${port}`);
-        }
+    if(server)
+    {
+        console.log(`Server is up and rumimg on port :: ${port}`);
     }
 };
