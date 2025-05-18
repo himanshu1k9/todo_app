@@ -17,6 +17,18 @@ const todoModel = new mongoose.Schema({
     time: {
         type: String,
         required: [true, 'time field is required.']
+    },
+    isCompleted: {
+        type: Number,
+        enum: [0, 1],
+        required: true,
+        default: 0
+    },
+    isDeleted: {
+        type: Number,
+        enum: [0, 1],
+        required: true,
+        default: 0
     }
 },
     { timestamps: true }

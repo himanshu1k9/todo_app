@@ -2,6 +2,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const userROutes = require('./routes/userRoutes');
+const todoRoutes = require('./routes/todoROutes');
 const cookieParser = require('cookie-parser');
 
 const db = require('./config/dbConnect');
@@ -18,6 +19,7 @@ todoApp.use(express.urlencoded({ extended: true }));
 todoApp.use(express.json());
 todoApp.use(cookieParser());
 todoApp.use('/todo', userROutes);
+todoApp.use('/todo', todoRoutes);
 
 
 module.exports.startServer = async () =>
