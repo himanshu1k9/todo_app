@@ -1,6 +1,6 @@
 const express = require('express');
-const dotenv = require('dotenv');
 const cors = require('cors');
+const dotenv = require('dotenv');
 const userROutes = require('./routes/userRoutes');
 const todoRoutes = require('./routes/todoROutes');
 const cookieParser = require('cookie-parser');
@@ -11,8 +11,10 @@ dotenv.config();
 
 const todoApp = express();
 
-todoApp.use(cors());
-
+todoApp.use(cors({
+    origin: 'http://localhost:3000',
+    credentials: true
+}));
 
 const port = process.env.APP_PORT || 8000;
 todoApp.use(express.urlencoded({ extended: true }));
