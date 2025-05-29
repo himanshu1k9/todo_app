@@ -17,7 +17,6 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { DatePicker, TimePicker } from '@mui/x-date-pickers';
 
-
 const Dashboard = () => {
     const { isAuthenticated } = useContext(AuthContext);
     const navigate = useNavigate();
