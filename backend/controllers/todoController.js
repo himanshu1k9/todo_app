@@ -16,10 +16,10 @@ module.exports.createTodo = async (req, res) =>
         errors.push('invalid date format.')
     }
 
-    if(!time || !validatr.isTime(time))
-    {
-        errors.push('Invalid time format.')
-    };
+    // if(!time || !validatr.isTime(time))
+    // {
+    //     errors.push('Invalid time format.')
+    // };
 
     if(!userId)
     {
@@ -67,7 +67,6 @@ module.exports.getTodos = async (req, res) =>
 {
     const user = req.user;
     const userId = user?._id;
-
     if(userId)
     {
         const todos = await todoModel.find({ user: userId });
@@ -133,6 +132,7 @@ module.exports.updateTodo = async (req, res) =>
 {
     const { title, date, time, isCompleted } = req.body;
     const todoId = req.params.id;
+    const errors = [];
 
     if(date && !validatr.isDate(date))
     {

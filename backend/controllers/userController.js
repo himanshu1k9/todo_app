@@ -48,7 +48,8 @@ module.exports.registerUser = async (req, res) =>
 
         return res.json({
             success: true,
-            message: 'User registered successfully.'
+            message: 'User registered successfully.',
+            createdUser
         }).status(200);
     } catch(error)
     {
@@ -88,13 +89,15 @@ module.exports.loginUser = async (req, res) =>
             {
                 res.cookie('token', token, {
                     httpOnly: true,
-                    secure: process.env.NODE_ENV === 'production',
+                    secure: false,
                     maxAge: 1 * 60 * 60 * 1000,
+                    path: '/',
                 });
                 return res.json({
                     token: token,
                     success: true,
-                    message: 'User logged in successfully.'
+                    message: 'User logged in successfully.',
+                    user:existingUser
                 }).status(200);
             } else {
                 return res.json({
@@ -114,4 +117,42 @@ module.exports.loginUser = async (req, res) =>
             message: 'User not found'
         }).status(400);
     }
+}
+
+module.exports.checkIsAuthenticated = async (req, res) => 
+{
+    const token = req.cookies.token;
+    if(!token)
+    {
+        return res.json({isAuthenticated: false}).status(400);
+    }
+    try
+    {
+        const decodedToken = await jwt.verify(token, process.env.JWT_SECRET_KEY);
+        return res.json({
+            isAuthenticated: true,
+            user: decodedToken.user
+        }).status(200);
+    } catch(err)
+    {
+        return res.status(500).json({
+            success: false,
+            message: err.message
+        })
+    }
+}
+
+
+module.exports.handleLogout = async (req, res) => 
+{
+   await res.clearCookie('token', {
+        httpOnly: true,
+        secure: false,
+        path: '/',
+    });
+
+    return res.json({
+        success:true,
+        message: 'User LoggedOut successfully.'
+    }).status(200);
 }
