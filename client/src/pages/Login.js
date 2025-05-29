@@ -3,21 +3,35 @@ import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { TextField, Button, Paper, Typography, Box, Container } from "@mui/material";
 import Layout from "../components/layouts/Layout";
+import toast from "react-hot-toast";
+import { useContext } from "react";
+import AuthContext from "../context/AuthContext";
 
 const Login = () => {
   const [form, setForm] = useState({ email: "", password: "" });
+  const [error, setError] = useState(' ');
+  const useAuth = useContext(AuthContext);
+  const { setIsAuthenticated, setUser } = useAuth;
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(' ');
     try {
-     await axios.post(`${process.env.REACT_APP_SERVER_PATH}/todo/login`, form, {
+     const res = await axios.post(`${process.env.REACT_APP_SERVER_PATH}/todo/login`, form, {
         withCredentials: true,
     });
-      navigate("/dashboard");
+
+      if(res.data.success) {
+        toast.success(res.data.message, {duration: 3000});
+        setIsAuthenticated(true);
+        setUser(res.data.user)
+        navigate("/dashboard");
+      } else {
+        toast.error(res.data.message, {duration: 3000});
+      }
     } catch (err) {
-      console.error(err);
-      alert("Login failed!");
+      setError(err.response?.data?.message || 'Log in failed');
     }
   };
 
@@ -29,6 +43,7 @@ const Login = () => {
           Login
         </Typography>
         <Box component="form" onSubmit={handleSubmit}>
+          {error && <p style={{color: 'red'}}>{error}</p>}
           <TextField
             label="Email"
             type="email"

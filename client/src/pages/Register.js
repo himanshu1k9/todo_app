@@ -6,27 +6,33 @@ import Layout from "../components/layouts/Layout";
 
 const Register = () => {
   const [form, setForm] = useState({ username: "", email: "", password: "" });
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`${process.env.REACT_APP_SERVER_PATH}/todo/user`, form);
-      navigate("/login");
+      const res = await axios.post(`${process.env.REACT_APP_SERVER_PATH}/todo/user`, form, {withCredentials:true});
+      if(res.data?.success) {
+        navigate("/login");
+      } else {
+        setError(res.data?.message);
+      }
     } catch (err) {
-      console.error(err);
+      setError(err.response?.data?.message || 'An error occured while registering the user.');
       alert("Registration failed!");
     }
   };
 
   return (
     <Layout>
-        <Container maxWidth="sm">
+      <Container maxWidth="sm">
       <Paper elevation={4} sx={{ p: 4, mt: 8 }}>
         <Typography variant="h4" align="center" gutterBottom>
           Register
         </Typography>
         <Box component="form" onSubmit={handleSubmit}>
+          {error && <p style={{color: 'red'}}>{error}</p>}
           <TextField
             label="Username"
             fullWidth
